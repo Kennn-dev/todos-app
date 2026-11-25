@@ -1,4 +1,5 @@
-import { useTodos } from "@/app/hooks";
+import { useTodos } from "@/app/todos.hooks";
+import { isTextEmpty } from "@/models/Task.model";
 import { useState } from "react";
 import Task from "./task";
 import { Button } from "./ui/button";
@@ -25,6 +26,7 @@ export default function List(props: ListProps) {
           onChange={(e) => setText(e.target.value)}
         />
         <Button
+          disabled={isTextEmpty(text)}
           onClick={() => {
             addTask(text);
             setText("");

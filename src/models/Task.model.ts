@@ -1,32 +1,29 @@
 export interface ITask {
-  id: number;
+  id: string;
   title: string;
-  isCheck: boolean;
+  completed: boolean;
+}
+export const isTextEmpty = (text: string): boolean => text.trim() === "";
+export function create(title: string, id: string): ITask | null {
+  if (isTextEmpty(title)) return null;
+  return {
+    id,
+    title,
+    completed: false,
+  };
 }
 
-export class TaskService {
-  constructor() {}
-
-  create(title: string): ITask {
-    return {
-      id: Date.now(),
-      title,
-      isCheck: false,
-    };
-  }
-
-  toggleCheck(tasks: ITask[], id: number): ITask[] {
-    const index = tasks.findIndex((p) => p.id === id);
-    if (index !== -1) {
-      tasks[index].isCheck = !tasks[index].isCheck;
+export function toggleComplete(tasks: ITask[], id: string): ITask[] {
+  const ts = [...tasks];
+  return ts.map((t) => {
+    if (t.id === id) {
+      t.completed = !t.completed;
     }
+    return t;
+  });
+}
 
-    return tasks;
-  }
-
-  delete(tasks: ITask[], id: number): ITask[] {
-    const index = tasks.findIndex((p) => p.id === id);
-    tasks.splice(index, 1);
-    return tasks;
-  }
+export function deleteTask(tasks: ITask[], id: string): ITask[] {
+  const ts = [...tasks];
+  return ts.filter((t) => t.id !== id);
 }

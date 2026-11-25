@@ -9,24 +9,24 @@ import { Button } from "./ui/button";
 
 interface TaskProps {
   task: ITask;
-  onToggleCheck(id: number, status: boolean): void;
-  onDelete(id: number): void;
+  onToggleCheck(id: string): void;
+  onDelete(id: string): void;
 }
 export default function Task(props: TaskProps) {
   const { task, onDelete, onToggleCheck } = props;
   return (
     <div
-      className={` flex gap-1.5 items-center justify-between px-3 py-2 ${task.isCheck ? "opacity-30" : "opacity-100"} transition-all`}
+      className={` flex gap-1.5 items-center justify-between px-3 py-2 ${task.completed ? "opacity-30" : "opacity-100"} transition-all`}
     >
       <div className={`flex items-center gap-1 flex-1 `}>
-        {task.isCheck ? (
+        {task.completed ? (
           <HugeiconsIcon
             cursor={"pointer"}
             icon={CircleCheckIcon}
             size={24}
             color="var(--primary)"
             strokeWidth={1.5}
-            onClick={() => onToggleCheck(task.id!, task.isCheck)}
+            onClick={() => onToggleCheck(task.id)}
           />
         ) : (
           <HugeiconsIcon
@@ -35,7 +35,7 @@ export default function Task(props: TaskProps) {
             size={24}
             color="currentColor"
             strokeWidth={1.5}
-            onClick={() => onToggleCheck(task.id!, task.isCheck)}
+            onClick={() => onToggleCheck(task.id)}
           />
         )}
 
@@ -44,9 +44,9 @@ export default function Task(props: TaskProps) {
 
       <div className="action">
         <Button
-          className={`${task.isCheck && "invisible opacity-0"}`}
+          className={`${task.completed && "invisible opacity-0"}`}
           size={"icon-lg"}
-          onClick={() => onDelete(task.id!)}
+          onClick={() => onDelete(task.id)}
         >
           <HugeiconsIcon
             icon={TrashIcon}
