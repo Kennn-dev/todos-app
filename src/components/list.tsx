@@ -9,28 +9,36 @@ interface ListProps {}
 export default function List(props: ListProps) {
   const { addTask, tasks, deleteTask, toggleTask } = useTodos();
   const [text, setText] = useState<string>("");
+  const handleAddTask = () => {
+    addTask(text);
+    setText("");
+  };
   return (
-    <div className="flex flex-col gap-0 p-2">
-      {tasks.map((task) => (
-        <Task
-          key={task.id}
-          task={task}
-          onDelete={deleteTask}
-          onToggleCheck={toggleTask}
-        />
-      ))}
-      <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-1">
+        {tasks.map((task) => (
+          <Task
+            key={task.id}
+            task={task}
+            onDelete={deleteTask}
+            onToggleCheck={toggleTask}
+          />
+        ))}
+      </div>
+      <div className="flex flex-col gap-2">
         <Input
           placeholder="What next todo ?"
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleAddTask();
+            }
+          }}
         />
         <Button
           disabled={isTextEmpty(text)}
-          onClick={() => {
-            addTask(text);
-            setText("");
-          }}
+          onClick={handleAddTask}
           size={"default"}
           variant={"default"}
         >

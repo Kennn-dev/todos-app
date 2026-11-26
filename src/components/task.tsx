@@ -18,26 +18,28 @@ export default function Task(props: TaskProps) {
     <div
       className={` flex gap-1.5 items-center justify-between px-3 py-2 ${task.completed ? "opacity-30" : "opacity-100"} transition-all`}
     >
-      <div className={`flex items-center gap-1 flex-1 `}>
-        {task.completed ? (
-          <HugeiconsIcon
-            cursor={"pointer"}
-            icon={CircleCheckIcon}
-            size={24}
-            color="var(--primary)"
-            strokeWidth={1.5}
-            onClick={() => onToggleCheck(task.id)}
-          />
-        ) : (
-          <HugeiconsIcon
-            cursor={"pointer"}
-            icon={CircleIcon}
-            size={24}
-            color="currentColor"
-            strokeWidth={1.5}
-            onClick={() => onToggleCheck(task.id)}
-          />
-        )}
+      <div className={`flex items-start gap-2 flex-1 `}>
+        <div className="flex-none  ">
+          {task.completed ? (
+            <HugeiconsIcon
+              cursor={"pointer"}
+              icon={CircleCheckIcon}
+              size={24}
+              color="var(--primary)"
+              strokeWidth={1.5}
+              onClick={() => onToggleCheck(task.id)}
+            />
+          ) : (
+            <HugeiconsIcon
+              cursor={"pointer"}
+              icon={CircleIcon}
+              size={24}
+              color="currentColor"
+              strokeWidth={1.5}
+              onClick={() => onToggleCheck(task.id)}
+            />
+          )}
+        </div>
 
         <span>{task.title}</span>
       </div>
