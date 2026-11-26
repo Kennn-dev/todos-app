@@ -1,26 +1,17 @@
-import { uuid } from "@/utils";
-import { isTextEmpty } from "@/utils/string.utils";
-
 export interface Tag {
   id: string;
-
   name: string;
 }
 
-export function createTag(name: string): Tag | null {
-  if (isTextEmpty(name)) return null;
-  console.log("name", name);
+export function createTag(id: string, name: string): Tag | null {
+  if (!isValidTag(name)) return null;
   return {
-    id: uuid(),
-
+    id,
     name,
   };
 }
 
-export function editTag() {
-  // ... edit selected tag
-}
-
-export function deleteTag() {
-  // ...delete selected tag in list tags
+export function isValidTag(name: string): boolean {
+  if (name.trim() === "") return false;
+  return true;
 }

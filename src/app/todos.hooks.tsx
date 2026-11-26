@@ -2,6 +2,7 @@ import type { Tag } from "@/models/Tag.model";
 import {
   create,
   deleteTask,
+  editTask,
   toggleComplete,
   type ITask,
   type TaskUpdatePayload,
@@ -11,16 +12,15 @@ import { useState } from "react";
 
 export function useTodos() {
   const [tasks, setTasks] = useState<ITask[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const addTask = (text: string, tags: Tag[] = []): void => {
-    const newTask = create(text, uuid(), tags);
-    if (newTask === null) return;
+  const addTask = (title: string, tags: Tag[] = []): boolean => {
+    const newTask = create(title, uuid(), tags);
+    if (newTask === null) return false;
     setTasks((prev) => [...prev, newTask]);
+    return true;
   };
 
   const toggleTask = (id: string) => {
-    if (id === selectedId) return;
     const newTasks = toggleComplete(tasks, id);
     setTasks(newTasks);
   };
@@ -34,25 +34,11 @@ export function useTodos() {
     return tasks.find((t) => t.id === id);
   };
 
-  const selectTaskId = (id: string | null) => {
-    setSelectedId(id);
-  };
-
-  const saveTask = (task: TaskUpdatePayload): void => {
-    if (selectedId === null) return;
-    const t = getTaskById(selectedId);
-    if (!t) return;
-    const updatedTasks = tasks.map((v) => {
-      if (v.id === t.id) {
-        return {
-          ...v,
-          title: task.title,
-          tags: task.tags,
-        };
-      }
-      return v;
-    });
+  const saveTask = (id: string, task: TaskUpdatePayload): boolean => {
+    const updatedTasks = editTask(id, tasks, task);
+    if (updatedTasks === null) return false;
     setTasks(updatedTasks);
+    return true;
   };
 
   return {
@@ -61,8 +47,6 @@ export function useTodos() {
     toggleTask,
     deleteTask: deleteTodo,
     getTaskById,
-    selectTaskId,
-    selectedId,
     saveTask,
   };
 }

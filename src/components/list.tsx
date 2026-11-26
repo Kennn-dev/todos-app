@@ -1,6 +1,6 @@
 import useListView from "@/app/list.hooks";
 import { useTodos } from "@/app/todos.hooks";
-import { isTextEmpty } from "@/utils/string.utils";
+import { isValidTaskName } from "@/models/Task.model";
 import InputTags from "./input-tags";
 import Task from "./task";
 import { Button } from "./ui/button";
@@ -8,24 +8,32 @@ import { Input } from "./ui/input";
 
 interface ListProps {}
 export default function List(props: ListProps) {
+  const { addTask, tasks, deleteTask, toggleTask, getTaskById, saveTask } =
+    useTodos();
+
   const {
-    addTask,
-    tasks,
-    deleteTask,
-    toggleTask,
-    getTaskById,
-    selectedId,
-    selectTaskId,
-    saveTask,
-  } = useTodos();
-  const { initForm, reset, tags, text, setTags, setText } = useListView();
-  const handleAddTask = () => {
-    addTask(text, tags);
-    reset();
-    selectTaskId(null);
+    initForm,
+
+    tags,
+    text,
+    setTags,
+    setText,
+
+    mode,
+    submit,
+    changeCreateMode,
+    changeUpdateMode,
+    reset,
+  } = useListView({
+    create: (data) => addTask(data.title, data.tags),
+    update: saveTask,
+  });
+
+  const handleSubmit = () => {
+    submit();
   };
+
   const handleEdit = (id: string) => {
-    selectTaskId(id);
     const task = getTaskById(id);
     if (!task) {
       return;
@@ -34,15 +42,10 @@ export default function List(props: ListProps) {
       tags: task.tags,
       title: task.title,
     });
+    changeUpdateMode(id);
   };
-  const handleSaveTask = () => {
-    saveTask({
-      tags,
-      title: text,
-    });
-    reset();
-    selectTaskId(null);
-  };
+
+  const selected = (id: string) => mode?.type === "edit" && mode.id === id;
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
@@ -53,7 +56,7 @@ export default function List(props: ListProps) {
             onDelete={deleteTask}
             onToggleCheck={toggleTask}
             onEdit={handleEdit}
-            selected={selectedId === task.id}
+            selected={selected(task.id)}
           />
         ))}
       </div>
@@ -65,22 +68,26 @@ export default function List(props: ListProps) {
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              handleAddTask();
+              handleSubmit();
             }
           }}
         />
-        <InputTags value={tags} onChange={setTags} />
+        <InputTags placeholder="Tags ..." value={tags} onChange={setTags} />
+        <div className="flex gap-3 items-center">
+          <Button
+            className={"flex-3/4"}
+            disabled={!isValidTaskName(text)}
+            onClick={handleSubmit}
+            size={"default"}
+            variant={"default"}
+          >
+            {mode?.type === "create" ? "Add task" : "Save task"}
+          </Button>
 
-        <Button
-          disabled={isTextEmpty(text)}
-          onClick={() => {
-            selectedId !== null ? handleSaveTask() : handleAddTask();
-          }}
-          size={"default"}
-          variant={"default"}
-        >
-          {selectedId !== null ? "Save task" : "Add task"}
-        </Button>
+          <Button onClick={reset} size={"default"} variant={"outline"}>
+            Cancel
+          </Button>
+        </div>
       </div>
     </div>
   );

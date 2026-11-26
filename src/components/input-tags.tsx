@@ -1,19 +1,21 @@
 import { createTag, type Tag } from "@/models/Tag.model";
+import { uuid } from "@/utils";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useRef, useState, type KeyboardEvent } from "react";
 import { Badge } from "./ui/badge";
 interface InputTagProps {
+  placeholder?: string;
   value: Tag[];
   onChange(value: Tag[]): void;
 }
 export default function InputTags(props: InputTagProps) {
-  const { value, onChange } = props;
+  const { value, onChange, placeholder } = props;
   const [search, setSearch] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const addTag = (tagName: string) => {
-    const tag = createTag(tagName);
+    const tag = createTag(uuid(), tagName);
     if (tag === null) return;
     onChange([...value, tag]);
     setSearch("");
@@ -44,7 +46,7 @@ export default function InputTags(props: InputTagProps) {
         {value.map((t) => (
           <Badge key={t.id} variant={"outline"}>
             <div className="flex gap-1 items-center">
-              <span> {t.name}</span>
+              <span>{t.name}</span>
 
               <HugeiconsIcon
                 cursor={"pointer"}
@@ -68,6 +70,7 @@ export default function InputTags(props: InputTagProps) {
       </div>
       <input
         id="tags-input"
+        placeholder={placeholder}
         ref={inputRef}
         value={search}
         onBlur={() => search && addTag(search)}

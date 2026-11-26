@@ -1,4 +1,3 @@
-import { isTextEmpty } from "@/utils/string.utils";
 import type { Tag } from "./Tag.model";
 
 export interface ITask {
@@ -14,20 +13,22 @@ export function create(
   id: string,
   tags: Tag[] = [],
 ): ITask | null {
-  if (isTextEmpty(title)) return null;
+  if (!isValidTaskName(title)) return null;
   return {
     id,
-    title,
+    title: title.trim(),
     completed: false,
     tags,
   };
 }
 
 export function toggleComplete(tasks: ITask[], id: string): ITask[] {
-  const ts = [...tasks];
-  return ts.map((t) => {
+  return tasks.map((t) => {
     if (t.id === id) {
-      t.completed = !t.completed;
+      return {
+        ...t,
+        completed: !t.completed,
+      };
     }
     return t;
   });
@@ -38,32 +39,28 @@ export function deleteTask(tasks: ITask[], id: string): ITask[] {
   return ts.filter((t) => t.id !== id);
 }
 
-export function editTask(
-  tasks: ITask[],
-  id: string,
-  data: Pick<ITask, "tags" | "title">,
-): ITask[] {
-  const ts = [...tasks];
-  return ts.map((t) => {
-    if (t.id === id) {
-      return {
-        ...t,
-        title: data.title,
-        tags: data.tags,
-      };
-    }
-    return t;
-  });
-}
-
 export function addTagToTask(task: ITask, tag: Tag): ITask {
-  const t = { ...task };
-  t.tags.push(tag);
-  return t;
+  return {
+    ...task,
+    tags: [...task.tags, tag],
+  };
 }
 
-export function deleteTagInTask(task: ITask, tagId: string) {
-  const t = { ...task };
-  t.tags.filter((t) => t.id !== tagId);
-  return t;
+export function isValidTaskName(name: string): boolean {
+  if (name.trim() === "") return false;
+  return true;
 }
+
+export function editTask(
+  id: string,
+  tasks: ITask[],
+  task: TaskUpdatePayload,
+): ITask[] | null {
+  const target = tasks.find((t) => t.id === id);
+  if (!target || !canEdit(target) || !isValidTaskName(task.title)) return null;
+
+  return tasks.map((t) =>
+    t.id === id ? { ...t, ...task, title: task.title.trim() } : t,
+  );
+}
+export const canEdit = (task: ITask) => !task.completed;
