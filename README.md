@@ -15,9 +15,10 @@ npm run dev
 
 ## Nhật ký requirement
 
-| Vòng | Requirement | Ghi chú |
-| --- | --- | --- |
-| 1 | Thêm / xem / toggle hoàn thành / xoá todo | |
+| Vòng | Requirement                                          | Ghi chú                         |
+| ---- | ---------------------------------------------------- | ------------------------------- |
+| 1    | Thêm / xem / toggle hoàn thành / xoá todo            |                                 |
+| 2    | Search / filter todo by ( name, tags , createdDate ) | thêm createdDate, tags mỗi todo |
 
 ## Nợ kỹ thuật
 
