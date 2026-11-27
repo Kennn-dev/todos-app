@@ -26,7 +26,7 @@ export default function InputTags(props: InputTagProps) {
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ";") {
+    if (e.key === "Enter" || e.key === ",") {
       addTag(search);
       e.preventDefault();
       return;

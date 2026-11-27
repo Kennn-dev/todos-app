@@ -14,20 +14,25 @@ export function useTodos() {
   const [tasks, setTasks] = useState<ITask[]>([]);
 
   const addTask = (title: string, tags: Tag[] = []): boolean => {
-    const newTask = create(title, uuid(), tags);
+    const newTask = create({
+      title,
+      tags,
+      completed: false,
+      content: "",
+      createdAt: new Date(),
+      id: uuid(),
+    });
     if (newTask === null) return false;
     setTasks((prev) => [...prev, newTask]);
     return true;
   };
 
   const toggleTask = (id: string) => {
-    const newTasks = toggleComplete(tasks, id);
-    setTasks(newTasks);
+    setTasks((prev) => toggleComplete(prev, id));
   };
 
   const deleteTodo = (id: string) => {
-    const newTasks = deleteTask(tasks, id);
-    setTasks(newTasks);
+    setTasks((prev) => deleteTask(prev, id));
   };
 
   const getTaskById = (id: string): ITask | undefined => {

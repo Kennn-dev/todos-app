@@ -15,3 +15,4 @@ export function isValidTag(name: string): boolean {
   if (name.trim() === "") return false;
   return true;
 }
+// hasTag(tags, name)

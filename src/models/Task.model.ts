@@ -6,19 +6,23 @@ export interface ITask {
   completed: boolean;
   // v2
   tags: Tag[];
+  content: string;
+  createdAt: Date;
+
+  //v3
+  status?: string;
 }
 export interface TaskUpdatePayload extends Pick<ITask, "tags" | "title"> {}
-export function create(
-  title: string,
-  id: string,
-  tags: Tag[] = [],
-): ITask | null {
-  if (!isValidTaskName(title)) return null;
+
+export function create(task: ITask): ITask | null {
+  if (!isValidTaskName(task.title)) return null;
   return {
-    id,
-    title: title.trim(),
-    completed: false,
-    tags,
+    id: task.id,
+    title: task.title.trim(),
+    completed: task.completed,
+    tags: task.tags,
+    content: task.content,
+    createdAt: task.createdAt,
   };
 }
 

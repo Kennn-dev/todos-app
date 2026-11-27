@@ -1,51 +1,62 @@
-import useListView from "@/app/list.hooks";
 import { useTodos } from "@/app/todos.hooks";
-import { isValidTaskName } from "@/models/Task.model";
-import InputTags from "./input-tags";
+import type { TaskUpdatePayload } from "@/models/Task.model";
+import { useState } from "react";
+import FormDrawer from "./form-drawer";
 import Task from "./task";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 
+export type Mode = { type: "create" } | { type: "edit"; id: string };
 interface ListProps {}
 export default function List(props: ListProps) {
   const { addTask, tasks, deleteTask, toggleTask, getTaskById, saveTask } =
     useTodos();
 
-  const {
-    initForm,
+  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<Mode>({ type: "create" });
 
-    tags,
-    text,
-    setTags,
-    setText,
+  const isCreateMode = mode.type === "create";
+  const isEditMode = mode.type === "edit";
 
-    mode,
-    submit,
-    changeCreateMode,
-    changeUpdateMode,
-    reset,
-  } = useListView({
-    create: (data) => addTask(data.title, data.tags),
-    update: saveTask,
-  });
+  const handleSubmit = (payload: TaskUpdatePayload) => {
+    let result: boolean = false;
+    if (isCreateMode) {
+      result = addTask(payload.title, payload.tags);
+    }
 
-  const handleSubmit = () => {
-    submit();
+    if (isEditMode) {
+      result = saveTask(mode.id, payload);
+    }
+
+    setOpen(!result);
   };
 
   const handleEdit = (id: string) => {
+    setOpen(true);
+    setMode({ type: "edit", id });
+  };
+
+  const handleCreate = () => {
+    setOpen(true);
+    setMode({ type: "create" });
+  };
+
+  const getInitialValue = (id: string | null): TaskUpdatePayload => {
+    const _default = {
+      tags: [],
+      title: "",
+    };
+    if (id === null) return _default;
     const task = getTaskById(id);
-    if (!task) {
-      return;
-    }
-    initForm({
-      tags: task.tags,
-      title: task.title,
-    });
-    changeUpdateMode(id);
+    if (!task) return _default;
+
+    return {
+      tags: task?.tags,
+      title: task?.title,
+    };
   };
 
   const selected = (id: string) => mode?.type === "edit" && mode.id === id;
+  const formValue = getInitialValue(isCreateMode ? null : mode.id);
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
@@ -60,35 +71,16 @@ export default function List(props: ListProps) {
           />
         ))}
       </div>
-      <div className="flex flex-col gap-2">
-        <Input
-          type="text"
-          placeholder="What next todo ?"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleSubmit();
-            }
-          }}
-        />
-        <InputTags placeholder="Tags ..." value={tags} onChange={setTags} />
-        <div className="flex gap-3 items-center">
-          <Button
-            className={"flex-3/4"}
-            disabled={!isValidTaskName(text)}
-            onClick={handleSubmit}
-            size={"default"}
-            variant={"default"}
-          >
-            {mode?.type === "create" ? "Add task" : "Save task"}
-          </Button>
-
-          <Button onClick={reset} size={"default"} variant={"outline"}>
-            Cancel
-          </Button>
-        </div>
+      <div className="text-right">
+        <Button onClick={handleCreate}>Create</Button>
       </div>
+      <FormDrawer
+        title={`${isCreateMode ? "Create" : "Edit"} ${isEditMode ? formValue.title : "Task"}`}
+        open={open}
+        onOpenChange={setOpen}
+        onSubmit={handleSubmit}
+        initialValues={formValue}
+      />
     </div>
   );
 }
